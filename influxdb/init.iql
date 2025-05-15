@@ -1,0 +1,25 @@
+-- influxdb/init.iql
+-- Create initial bucket if not exists
+CREATE BUCKET "printing_metrics" WITH RETENTION 30d
+
+-- Create telegraf user
+CREATE USER "telegraf" WITH PASSWORD 'metrics_password_123'
+
+-- Grant permissions
+GRANT READ ON "printing_metrics" TO "telegraf"
+GRANT WRITE ON "printing_metrics" TO "telegraf"
+
+-- Create continuous queries for downsampling
+CREATE CONTINUOUS QUERY "cq_10m" ON "3dprinting"
+BEGIN
+  SELECT mean(*) INTO "printing_metrics"."autogen".:MEASUREMENT 
+  FROM /.*/ GROUP BY time(10m), *
+END
+
+-- Create alert thresholds
+CREATE THRESHOLD "high_roughness" ON "printing_metrics"
+USING SELECT mean("roughness") FROM "printing_metrics" 
+WHERE time > now() - 5m
+GROUP BY "printer_id"
+WARN WHEN value > 60
+CRIT WHEN value > 80

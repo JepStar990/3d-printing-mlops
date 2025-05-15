@@ -1,0 +1,4 @@
+paho-mqtt
+scikit-learn
+python-dotenv
+influxdb-client

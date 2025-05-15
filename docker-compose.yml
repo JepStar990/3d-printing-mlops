@@ -1,0 +1,124 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./config/pwfile:/mosquitto/config/pwfile
+      - mosquitto_data:/mosquitto/data
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_pub -h localhost -t test -m 'ping' -u $${MQTT_USERNAME} -P $${MQTT_PASSWORD} || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - mqtt_network
+
+  telegraf:
+    image: telegraf
+    volumes:
+      - ./config/telegraf.conf:/etc/telegraf/telegraf.conf
+    env_file:
+      - .env
+    depends_on:
+      mqtt:
+        condition: service_healthy
+      influxdb:
+        condition: service_started
+    networks:
+      - mqtt_network
+      - influx_network
+
+  synthesizer:
+    build: ./synthesizer
+    env_file:
+      - .env
+      - ./synthesizer/.env.synthesizer
+    volumes:
+      - ./data:/app/data:ro
+    depends_on:
+      mqtt:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - mqtt_network
+    restart: unless-stopped
+
+  real-time:
+    build: ./real-time-engine
+    env_file:
+      - .env
+      - ./real-time-engine/.env.real-time
+    depends_on:
+      mqtt:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    networks:
+      - mqtt_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.gethostbyname('mqtt')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  influxdb:
+    image: influxdb:2.0
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    env_file:
+      - .env
+    networks:
+      - influx_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana-enterprise
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./dashboard/provisioning:/etc/grafana/provisioning
+      - grafana_data:/var/lib/grafana
+    env_file:
+      - .env
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    networks:
+      - influx_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mosquitto_data:
+  influxdb_data:
+  grafana_data:
+
+networks:
+  mqtt_network:
+    driver: bridge
+    name: mqtt_net
+  influx_network:
+    driver: bridge
+    name: influx_net

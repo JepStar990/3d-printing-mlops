@@ -1,0 +1,4 @@
+paho-mqtt
+numpy
+pandas
+python-dotenv
