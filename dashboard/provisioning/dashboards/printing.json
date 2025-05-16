@@ -1,0 +1,29 @@
+{
+  "title": "3D Printing Quality",
+  "panels": [
+    {
+      "title": "Roughness Trend",
+      "type": "timeseries",
+      "targets": [{
+        "query": "from(bucket: \"printing_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"printing_metrics\") |> filter(fn: (r) => r._field == \"roughness\")",
+        "rawQuery": true
+      }],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          { "color": "green", "value": null },
+          { "color": "orange", "value": 60 },
+          { "color": "red", "value": 80 }
+        ]
+      }
+    },
+    {
+      "title": "Temperature Correlation",
+      "type": "heatmap",
+      "targets": [{
+        "query": "from(bucket: \"printing_metrics\") |> range(start: -1h) |> filter(fn: (r) => r._measurement == \"printing_metrics\") |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")",
+        "rawQuery": true
+      }]
+    }
+  ]
+}
