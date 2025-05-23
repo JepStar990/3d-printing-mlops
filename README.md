@@ -94,20 +94,3 @@ For full documentation including architecture diagrams and API details, see:
 
 MIT License - See [LICENSE](LICENSE) for details.
 ```
-
-### Key Elements Included:
-
-1. **Visual Badges** - Quick tech stack identification
-2. **Quick Start Section** - Minimal setup instructions
-3. **Service Access Table** - All key URLs in one place
-4. **Common Commands** - Ready-to-copy usage examples
-5. **Troubleshooting** - Common issues and solutions
-6. **Structured Layout** - Clear file organization
-7. **Documentation Link** - Connection to full docs
-
-The README focuses on:
-- Getting users running quickly
-- Essential daily commands
-- Clear troubleshooting
-- Visual organization
-- Links to deeper documentation.
