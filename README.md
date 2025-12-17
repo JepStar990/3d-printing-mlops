@@ -93,4 +93,3 @@ For full documentation including architecture diagrams and API details, see:
 ## License 📜
 
 MIT License - See [LICENSE](LICENSE) for details.
-```
