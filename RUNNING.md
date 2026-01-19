@@ -40,6 +40,29 @@ This project uses Docker Compose to orchestrate all services.
 - **grafana**: Dashboard for visualizing printer health and roughness predictions.
 - **mosquitto**: MQTT message broker (runs inside the `real-time-engine` container, not a separate service).
 
+## ML Model Training
+
+To train the ML model for surface roughness prediction and log experiments to DagsHub:
+
+1. **Install dependencies** (if not already installed):
+   ```bash
+   pip install -r real-time-engine/requirements.txt
+   ```
+
+2. **Set up DagsHub**:
+   - Create a repository on [DagsHub](https://dagshub.com).
+   - Update `real-time-engine/.env.real-time` with your `DAGSHUB_REPO` URL, and optionally set `DAGSHUB_USERNAME` and `DAGSHUB_TOKEN` environment variables for authentication.
+
+3. **Run the training script**:
+   ```bash
+   cd real-time-engine
+   python train_model.py
+   ```
+   The script loads historical data (via `utils.load_data`), trains a k‑nearest neighbors regressor (or other model specified by `MODEL_TYPE`), evaluates performance, logs metrics to DagsHub via MLflow, and saves the trained model locally (default path `models/model.pkl`).
+
+4. **Use the trained model in the real‑time engine**:
+   Ensure the `MODEL_PATH` environment variable points to the saved model file. The processor will load it automatically on startup.
+
 ## Stopping the project
 
 ```bash
