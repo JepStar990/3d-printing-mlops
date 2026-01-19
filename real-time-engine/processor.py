@@ -52,6 +52,16 @@ class RealTimeProcessor:
         print(" InfluxDB client initialized")
 
     def load_model(self):
+        model_path = os.getenv('MODEL_PATH')
+        if model_path and os.path.exists(model_path):
+            try:
+                with open(model_path, 'rb') as f:
+                    model, scaler, feature_names = pickle.load(f)
+                    print(f" Loaded trained model from {model_path}")
+                    return TrainedSklearnModel(model, scaler, feature_names)
+            except Exception as e:
+                print(f" Failed to load trained model: {e}. Using dummy model.")
+        # Fallback to dummy model
         model_type = os.getenv('MODEL_TYPE', 'kNN')
         print(f" Loaded {model_type} model (dummy implementation)")
         return DummyModel()
@@ -119,6 +129,27 @@ class RealTimeProcessor:
             self.client.disconnect()
             if hasattr(self, 'influx_client'):
                 self.influx_client.close()
+
+class TrainedSklearnModel:
+    """Wrapper for a scikit-learn model trained offline"""
+    def __init__(self, model, scaler, feature_names):
+        self.model = model
+        self.scaler = scaler
+        self.feature_names = feature_names
+
+    def predict(self, data):
+        # Build feature vector in same order as feature_names
+        X = []
+        for f in self.feature_names:
+            # Use default 0 if feature missing
+            X.append(data.get(f, 0.0))
+        X_scaled = self.scaler.transform([X])[0]
+        pred = self.model.predict([X_scaled])[0]
+        return {
+            'predicted_roughness': pred,
+            'confidence': 0.95,   # could be derived from model uncertainty if available
+            'anomaly_score': 0.0  # placeholder
+        }
 
 class DummyModel:
     """Placeholder for actual ML model"""
