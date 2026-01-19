@@ -58,6 +58,10 @@ To train the ML model for surface roughness prediction and log experiments to Da
    cd real-time-engine
    python train_model.py
    ```
+   Alternatively, use the convenience script from the project root:
+   ```bash
+   bash scripts/train_model.sh
+   ```
    The script loads historical data (via `utils.load_data`), trains a k‑nearest neighbors regressor (or other model specified by `MODEL_TYPE`), evaluates performance, logs metrics to DagsHub via MLflow, and saves the trained model locally (default path `models/model.pkl`).
 
 4. **Use the trained model in the real‑time engine**:
@@ -67,6 +71,22 @@ To train the ML model for surface roughness prediction and log experiments to Da
 
 ```bash
 docker-compose down
+```
+
+## Committing Changes
+
+After making modifications, you can commit them with:
+
+```bash
+git add .
+git commit -m "your descriptive message"
+```
+
+To set the author name and email, configure git beforehand:
+
+```bash
+git config user.name "Your Name"
+git config user.email "your.email@example.com"
 ```
 
 ## Troubleshooting

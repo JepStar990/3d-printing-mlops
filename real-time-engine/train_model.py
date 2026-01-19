@@ -19,16 +19,25 @@ from utils.load_data import load_historical_data
 
 
 def main():
-    # Initialize DagsHub (requires DAGSHUB_USERNAME and DAGSHUB_TOKEN environment variables)
-    dagshub.init(
-        repo_owner='<your-username>',
-        repo_name='<your-repo>',
-        mlflow=True
-    )
-    mlflow.set_tracking_uri(
-        os.getenv('MLFLOW_TRACKING_URI',
-                  'https://dagshub.com/<your-username>/<your-repo>.mlflow')
-    )
+    # Configure MLflow tracking (local or DagsHub)
+    dagshub_repo = os.getenv('DAGSHUB_REPO')
+    if dagshub_repo and dagshub_repo.strip():
+        # Extract owner and repo name from URL (supports https://dagshub.com/<owner>/<repo>.git)
+        import re
+        match = re.search(r'https?://dagshub\.com/([^/]+)/([^/.]+)', dagshub_repo)
+        if match:
+            repo_owner = match.group(1)
+            repo_name = match.group(2)
+            dagshub.init(repo_owner=repo_owner, repo_name=repo_name, mlflow=True)
+            mlflow_tracking_uri = f'https://dagshub.com/{repo_owner}/{repo_name}.mlflow'
+            mlflow.set_tracking_uri(mlflow_tracking_uri)
+            print(f"Configured DagsHub MLflow tracking: {mlflow_tracking_uri}")
+        else:
+            print(f"Could not parse DAGSHUB_REPO: {dagshub_repo}. Using local MLflow.")
+            mlflow.set_tracking_uri('file:///tmp/mlruns')
+    else:
+        print("DAGSHUB_REPO not set. Using local MLflow.")
+        mlflow.set_tracking_uri('file:///tmp/mlruns')
 
     # Load historical data
     print("Loading historical data...")
