@@ -61,6 +61,28 @@ docker-compose exec mqtt mosquitto_pub -t 'printer/control/1' -m '{"speed":50}'
 docker-compose ps
 ```
 
+## Model Training 🧠
+
+Train the machine learning model for surface roughness prediction:
+
+```bash
+# Install Python dependencies
+pip3 install -r real-time-engine/requirements.txt
+
+# Run training from project root
+cd ~/3d-printing-mlops
+PYTHONPATH=. python3 real-time-engine/train_model.py
+
+# Or use the convenience script
+bash scripts/train_model.sh
+```
+
+The training script:
+1. Loads historical data from `data/data.csv` (or generates synthetic data if not found)
+2. Trains a machine learning model (default: K-Nearest Neighbors)
+3. Saves the model to `real-time-engine/models/model.pkl`
+4. Logs metrics to MLflow (local or DagsHub)
+
 ## Project Structure 📂
 ```
 ├── config/           # Service configurations
