@@ -5,8 +5,7 @@ services:
       - "1883:1883"
       - "9001:9001"
     volumes:
-      - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ./config/pwfile:/mosquitto/config/pwfile
+      - ./config/mosquitto:/mosquitto/config
       - mosquitto_data:/mosquitto/data
     env_file:
       - .env
