@@ -10,6 +10,9 @@ if [ -f "venv/bin/activate" ]; then
     source venv/bin/activate
 fi
 
+# Set PYTHONPATH to include the project root for utils imports
+export PYTHONPATH="$PWD:$PYTHONPATH"
+
 cd real-time-engine
 
 # Run training script
