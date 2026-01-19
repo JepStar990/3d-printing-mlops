@@ -21,7 +21,7 @@ config/pwfile
 config/mosquitto.conf
 
 # Data files
-data/*.csv
+# data/*.csv
 
 # IDE settings
 .vscode/
