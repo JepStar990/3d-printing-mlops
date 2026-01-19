@@ -4,6 +4,7 @@ __pycache__/
 *.pyo
 *.pyd
 *.env
+.env.*
 *.egg-info/
 dist/
 build/
@@ -30,3 +31,4 @@ data/*.csv
 
 # Misc
 *.DS_Store
+.aider*
