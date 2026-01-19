@@ -38,6 +38,27 @@ def load_historical_data():
             df = generate_synthetic_data()
     
     print(f"Loaded {len(df)} historical records")
+    
+    # Rename columns to match expected names in train_model.py
+    # The training script expects 'surface_roughness' as target column
+    # Also ensure other columns have consistent names
+    column_mapping = {
+        'roughness': 'surface_roughness',
+        'surface_roughness': 'surface_roughness',  # In case it's already named correctly
+    }
+    
+    # Apply renaming
+    for old_name, new_name in column_mapping.items():
+        if old_name in df.columns and new_name not in df.columns:
+            df = df.rename(columns={old_name: new_name})
+    
+    # If 'surface_roughness' is still not present, check for similar columns
+    if 'surface_roughness' not in df.columns:
+        # Look for any column containing 'roughness'
+        roughness_cols = [col for col in df.columns if 'roughness' in col.lower()]
+        if roughness_cols:
+            df = df.rename(columns={roughness_cols[0]: 'surface_roughness'})
+    
     return df
 
 def query_influxdb_data():
@@ -92,19 +113,19 @@ def generate_synthetic_data(num_samples=1000):
         'bed_temperature': np.random.uniform(50, 100, num_samples),
         'print_speed': np.random.uniform(30, 100, num_samples),
         'layer_height': np.random.uniform(0.1, 0.3, num_samples),
-        'roughness': np.random.uniform(10, 100, num_samples)  # Target variable
+        'surface_roughness': np.random.uniform(10, 100, num_samples)  # Target variable
     }
     
     # Add some correlation between features and roughness
     # Higher temperature and lower speed tend to reduce roughness
-    data['roughness'] = (
+    data['surface_roughness'] = (
         100 
         - 0.3 * (data['nozzle_temperature'] - 180) 
         + 0.2 * data['print_speed']
         + np.random.normal(0, 10, num_samples)
     )
     # Ensure roughness is within bounds
-    data['roughness'] = np.clip(data['roughness'], 10, 100)
+    data['surface_roughness'] = np.clip(data['surface_roughness'], 10, 100)
     
     df = pd.DataFrame(data)
     return df
