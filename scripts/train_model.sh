@@ -15,7 +15,7 @@ export PYTHONPATH="$PWD:$PYTHONPATH"
 
 cd real-time-engine
 
-# Run training script
-python train_model.py
+# Run training script with python3
+python3 train_model.py
 
 echo "Training finished. Model saved to models/model.pkl"

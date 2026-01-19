@@ -56,7 +56,7 @@ To train the ML model for surface roughness prediction and log experiments to Da
 3. **Run the training script**:
    ```bash
    cd real-time-engine
-   python train_model.py
+   python3 train_model.py
    ```
    Alternatively, use the convenience script from the project root:
    ```bash
