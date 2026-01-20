@@ -22,7 +22,7 @@ A real-time monitoring system for 3D printers with automated quality control usi
 
 ### Installation
 ```bash
-git clone https://github.com/yourrepo/3d-printing-mlops.git
+git clone https://github.com/JepStar990/3d-printing-mlops.git
 cd 3d-printing-mlops
 
 # Set up environment
