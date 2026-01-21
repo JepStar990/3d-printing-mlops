@@ -99,7 +99,7 @@ A real-time monitoring system for 3D printers that:
 
 1. Clone repository:
    ```bash
-   git clone https://github.com/yourrepo/3d-printing-mlops.git
+   git clone https://github.com/JepStar990/3d-printing-mlops.git
    cd 3d-printing-mlops
    ```
 
@@ -224,12 +224,3 @@ docker-compose exec influxdb influx query -f /scripts/export.iql
 ## 📜 License
 
 MIT License - See [LICENSE](LICENSE) for details.
-
----
-
-This documentation provides complete coverage of:
-- System architecture and design decisions
-- Detailed installation/configuration instructions
-- Operational procedures
-- Maintenance guidelines
-- Future roadmap
